@@ -7,6 +7,8 @@ JPromptManager allows you to:
 2. Run multi-step prompts with variable interpolation without having to worry about correctly chaining the calls to the underlying LLM;
 3. Access the output of your prompts in a standardized, Java-friendly way, e.g. allowing to easily deserialize to POJOs.
 
+JPromptManager is structured in such a way that it can be extended to support any LLM. At the moment, though, we only provide an implementation that connects to OpenAI. If you want to know how to extend it, look at how the OpenAIConnector is implemented; if you need any additional guidance feel free to open an issue.
+
 # Usage
 **Basic usage**
 
@@ -141,14 +143,10 @@ LLMs usually have several parameters which can customize the execution. We can d
 </prompt>
 ```
 
-The names and values of these parameters depends on the underlying LLM. At this time only OpenAI is supported. For the OpenAI connector the following parameters
+The names and values of these parameters depends on the underlying LLM.For the OpenAI connector (the only one supported at the moment) the following parameters
 are available:
 
 * temperature
 * model
 * maxTokens
 * topP
-
-# Examples
-
-The `examples` package and the `example-prompts.xml` contains the full code for these examples.
