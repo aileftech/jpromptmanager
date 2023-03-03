@@ -1,5 +1,7 @@
 # JPromptManager - A simple Java library to efficiently manage LLM prompts
 
+[https://ailef.tech/jpromptmanager/docs/index.html](Javadoc)
+
 If you've developed an application that makes heavy use of LLMs, you've probably run into the issue of managing your many prompts efficiently. JPromptManager tries to solve the most common pain points by providing a simple interface to store, manage and run prompts.
 
 JPromptManager allows you to:
