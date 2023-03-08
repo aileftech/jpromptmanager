@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.dom4j.Document;
@@ -136,12 +137,19 @@ public class JPromptManager {
 					
 					String stepName = stepElement.attributeValue("name", null);
 					if (stepName == null)
-						throw new JPromptManagerException("All prompt steps must have a `name` attribute; found: " + stepElement.asXML());
-						
+						throw new JPromptManagerException("Found step object with missing `name` attribute; found: " + stepElement.asXML());
+					
 					newStep.setName(stepName);
 					
 					steps.add(newStep);
 				});
+				
+				
+				Set<String> distinctNames = 
+					steps.stream().map(PromptStep::getName).collect(Collectors.toSet());
+				if (steps.size() != distinctNames.size()) {
+					throw new JPromptManagerException("All prompt steps must have unique names: invalid prompt `" + promptClass);
+				}
 				
 				this.prompts.put(promptClass, new PromptTemplate(steps));
 			});
