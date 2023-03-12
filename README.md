@@ -174,15 +174,15 @@ LLMs usually have several parameters which can customize the execution. We can d
 These are the supported parameters for all available connectors.
 
 ### GPT-3 completion
-* temperature
-* model
-* maxTokens
-* topP
+* model	(required)
+* temperature (optional, default 0)
+* maxTokens (optional, default 256)
+* topP (optional, default 1)
 
 ### ChatGPT completion
-* temperature
-* model
-* maxTokens
+* model (required)
+* temperature (optional, default 0)
+* maxTokens (optional, default 256)
 
 **More**
 
