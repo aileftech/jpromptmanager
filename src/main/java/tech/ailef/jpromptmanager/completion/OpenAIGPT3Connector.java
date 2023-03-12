@@ -41,11 +41,6 @@ public class OpenAIGPT3Connector implements LLMConnector {
 	 */
 	@Override
 	public String complete(String prompt, Map<String, String> params) {
-		// Set default values, if no value present
-		params.putIfAbsent("temperature", "0");
-		params.putIfAbsent("topP", "1");
-		params.putIfAbsent("maxTokens", "256");
-		
 		// Cast parameters to correct type
 		double temperature = Double.parseDouble(params.get("temperature"));
 		double topP = Double.parseDouble(params.get("topP"));
@@ -71,6 +66,10 @@ public class OpenAIGPT3Connector implements LLMConnector {
 
 	@Override
 	public Map<String, String> getDefaultParams() {
-		return new PromptContextBuilder().set("model", model).build();
+		return new PromptContextBuilder().set("model", model)
+				.set("temperature", "0")
+				.set("topP", "1")
+				.set("maxTokens", "256")
+				.build();
 	}
 }
