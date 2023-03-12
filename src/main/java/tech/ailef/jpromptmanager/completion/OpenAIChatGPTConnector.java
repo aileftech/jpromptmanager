@@ -60,9 +60,8 @@ public class OpenAIChatGPTConnector implements LLMConnector {
 	 */
 	@Override
 	public String complete(String prompt, Map<String, String> params) {
-		params.putIfAbsent("maxTokens", "256");
-		
 		int maxTokens = Integer.parseInt(params.get("maxTokens"));
+		double temperature = Double.parseDouble(params.get("temperature"));
 		
 		String[] messages = prompt.split("(" + LLMConnector.PROMPT_TOKEN + ")|(" + LLMConnector.COMPLETION_TOKEN + ")");
 		
@@ -83,6 +82,7 @@ public class OpenAIChatGPTConnector implements LLMConnector {
 		ChatCompletionRequest completionRequest = ChatCompletionRequest.builder()
 			.messages(chatMessages)
 			.maxTokens(maxTokens)
+			.temperature(temperature)
 			.model(model)
 			.build();
 		
@@ -94,6 +94,9 @@ public class OpenAIChatGPTConnector implements LLMConnector {
 
 	@Override
 	public Map<String, String> getDefaultParams() {
-		return new PromptContextBuilder().set("model", model).build();
+		return new PromptContextBuilder().set("model", model)
+				.set("temperature", "0")
+				.set("maxTokens", "256")
+				.build();
 	}
 }
