@@ -23,9 +23,9 @@ import tech.ailef.jpromptmanager.prompts.Prompt;
 public interface LLMConnector {
 	public static final Logger logger = LogManager.getLogger(LLMConnector.class);
 	
-	public static final String PROMPT_TOKEN = "\n\n<{[PROMPT]}>\n\n";
+	public static final String PROMPT_TOKEN = "\n\n__#PROMPT#__\n\n";
 	
-	public static final String COMPLETION_TOKEN = "\n\n<{[COMPLETION]}>\n\n";
+	public static final String COMPLETION_TOKEN = "\n\n__#COMPLETION#__\n\n";
 	
 	public static final TemplateEngine TE = new TemplateEngine();
 	

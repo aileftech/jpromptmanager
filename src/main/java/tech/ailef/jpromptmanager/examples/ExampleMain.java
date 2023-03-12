@@ -1,11 +1,14 @@
 package tech.ailef.jpromptmanager.examples;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Map;
 
 import tech.ailef.jpromptmanager.JPromptManager;
 import tech.ailef.jpromptmanager.PromptContextBuilder;
-import tech.ailef.jpromptmanager.completion.OpenAIConnector;
+import tech.ailef.jpromptmanager.completion.LLMConnector;
+import tech.ailef.jpromptmanager.completion.OpenAIChatGPTConnector;
+import tech.ailef.jpromptmanager.completion.OpenAIGPT3Connector;
 
 /**
  * A set of examples.
@@ -17,8 +20,12 @@ public class ExampleMain {
 	public static void main(String[] args) {
 		/*
 		 * Instantiate OpenAI connector with OpenAI secret key, timeout (0 for no timeout), model id
+		 * Both GPT3 and ChatGPT connector are supported. ChatGPT connector supports an optional
+		 * 4th argument as the system prompt: a text that is prepended to each conversation in order
+		 * to give general guidance to the model (see https://platform.openai.com/docs/guides/chat).
 		 */
-		OpenAIConnector openAI = new OpenAIConnector("OPENAI_KEY", 0, "text-davinci-003");
+//		LLMConnector openAI = new OpenAIChatGPTConnector("OPENAI_KEY", 0, "gpt-3.5-turbo");
+		LLMConnector openAI = new OpenAIGPT3Connector("OPENAI_KEY", 0, "text-davinci-003");
 		
 		/*
 		 * Create JPromptManager instance using the connector. By default, this will try to load

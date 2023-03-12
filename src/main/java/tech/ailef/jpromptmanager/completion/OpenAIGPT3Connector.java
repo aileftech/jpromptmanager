@@ -17,7 +17,7 @@ import tech.ailef.jpromptmanager.exceptions.JPromptManagerException;
  * to the GPT-3 OpenAI endpoints. 
  *
  */
-public class OpenAIConnector implements LLMConnector {
+public class OpenAIGPT3Connector implements LLMConnector {
 	private OpenAiService service;
 
 	private String model;
@@ -28,12 +28,11 @@ public class OpenAIConnector implements LLMConnector {
 	 * @param timeout	timeout for requests, 0 means no timeout
 	 * @param model	the OpenAI model to use (this setting will be overridden if an individual `<step>` tag provides a different value)
 	 */
-	public OpenAIConnector(String apiKey, int timeout, String model) {
-		service = new OpenAiService(apiKey, Duration.ofSeconds(timeout));
-		
+	public OpenAIGPT3Connector(String apiKey, int timeout, String model) {
 		if (model == null)
 			throw new JPromptManagerException("Must specify which OpenAI model to use");
-		
+
+		service = new OpenAiService(apiKey, Duration.ofSeconds(timeout));
 		this.model = model;
 	}
 
@@ -46,7 +45,6 @@ public class OpenAIConnector implements LLMConnector {
 		params.putIfAbsent("temperature", "0");
 		params.putIfAbsent("topP", "1");
 		params.putIfAbsent("maxTokens", "256");
-		params.putIfAbsent("model", "text-davinci-003");
 		
 		// Cast parameters to correct type
 		double temperature = Double.parseDouble(params.get("temperature"));

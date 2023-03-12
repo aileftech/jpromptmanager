@@ -85,6 +85,7 @@ public class JPromptManager {
 		return llmConnector.complete(prompt, context, this);
 	}
 	
+
 	/**
 	 * Returns the {@link PromptTemplate} with the given name, null if missing.
 	 * @param name	the name of the prompt to get
