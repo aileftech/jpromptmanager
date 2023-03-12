@@ -1,4 +1,4 @@
-# JPromptManager - A simple Java library to efficiently manage LLM prompts
+# JPromptManager - A simple Java library to efficiently manage and run LLM prompts
 
 [Javadoc](https://ailef.tech/jpromptmanager/docs/index.html)
 
