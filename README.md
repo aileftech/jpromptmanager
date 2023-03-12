@@ -42,7 +42,8 @@ The `SingleStepStringPrompt` class is provided by JPromptManager and its default
 3. Initialize our LLM connector and JPromptManager:
 
 ```
-OpenAIConnector openAI = new OpenAIConnector("OPENAIKEY", 0, "text-davinci-003");
+LLMConnector openAI = new OpenAIGPT3Connector("OPENAI_KEY", 0, "text-davinci-003");
+// or for ChatGPT: LLMConnector openAI = new OpenAIChatGPTConnector("OPENAI_KEY", 0, "gpt-3.5-turbo");
 JPromptManager jPrompt = new JPromptManager(openAI, Paths.get("src/main/resources/prompts-examples.xml"));
 ```
 
