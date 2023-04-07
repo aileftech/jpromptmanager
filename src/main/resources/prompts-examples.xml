@@ -2,16 +2,16 @@
 <prompts>
 	<prompt type="ExampleCreateTagline">
 		<step name="tagline">
-			Write a tagline for a ${shopType} shop.
+			Write a tagline for a [[${shopType}]] shop.
 		</step>
 	</prompt>
 	
 	<prompt type="ExampleCreateTaglineLocation">
 		<step name="tagline">
-			Write a tagline for a ${shopType} shop.
+			Write a tagline for a [[${shopType}]] shop.
 		</step>
 		<step name="location">
-			Make up a location for the shop (in ${country}).
+			Make up a location for the shop (in [[${country}]]).
 		</step>
 	</prompt>
 	
@@ -21,7 +21,7 @@
 		as it will more reliably generate syntactically correct code.
 		 -->
 		<step name="shopJson" temperature="0">
-		Create a JSON object representing a ${shopType} shop in ${country}. 
+		Create a JSON object representing a [[${shopType}]] shop in [[${country}]]. 
 		Use the following template:
 		{
 			"name" : "the name of the shop",
@@ -33,7 +33,7 @@
 	
 	<prompt type="ExampleCreateShopMultiStep">
 		<step name="shopJson" temperature="0">
-		Create a JSON object representing a ${shopType} shop in ${country}. 
+		Create a JSON object representing a [[${shopType}]] shop in [[${country}]]. 
 		Use the following template:
 		{
 			"name" : "the name of the shop",
