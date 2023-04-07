@@ -21,13 +21,13 @@ JPromptManager is structured in such a way that it can be extended to support an
 <prompts>
 	<prompt type="ExampleCreateTagline">
 		<step name="tagline">
-			Write a tagline for a ${shopType} shop.
+			Write a tagline for a [[${shopType}]] shop.
 		</step>
 	</prompt>
 </prompts>
 ```
 
-Each prompt must define e `type` attribute which must correspond to a Java class that `extends Prompt<T>` (where `T` is the type of object returned by the prompt). A prompt can be made of multiple steps, and each step must have a unique `name`. The text in each step may contain variables that have to be wrapped inside ${curlyBraces}.
+Each prompt must define e `type` attribute which must correspond to a Java class that `extends Prompt<T>` (where `T` is the type of object returned by the prompt). A prompt can be made of multiple steps, and each step must have a unique `name`. The text in each step is processed with [Thymeleaf](https://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html) to allow complex templating possibilities.
 
 2. There must be a 1-to-1 mapping between prompts in the XML file and Java classes. In this simple scenario, we can define our class as:
 
@@ -64,10 +64,10 @@ Sometimes we are interested in sending multiple sequential prompts and collectin
 ```
 <prompt type="ExampleCreateTaglineLocation">
 	<step name="tagline">
-		Write a tagline for a ${shopType} shop.
+		Write a tagline for a [[${shopType}]] shop.
 	</step>
 	<step name="location">
-		Make up a location for the shop (in ${country}).
+		Make up a location for the shop (in [[${country}]]).
 	</step>
 </prompt>
 ```
@@ -126,7 +126,7 @@ Alternatively, we can instruct our LLM to output JSON code and deserialize it di
 	as it will more reliably generate syntactically correct code.
 	 -->
 	<step name="shopJson" temperature="0">
-	Create a JSON object representing a ${shopType} shop in ${country}. 
+	Create a JSON object representing a [[${shopType}]] shop in [[${country}]]. 
 	Use the following template:
 	{
 		"name" : "the name of the shop",
