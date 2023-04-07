@@ -1,13 +1,13 @@
 package tech.ailef.jpromptmanager.examples;
 
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Map;
+
+import org.thymeleaf.context.IContext;
 
 import tech.ailef.jpromptmanager.JPromptManager;
 import tech.ailef.jpromptmanager.PromptContextBuilder;
 import tech.ailef.jpromptmanager.completion.LLMConnector;
-import tech.ailef.jpromptmanager.completion.OpenAIChatGPTConnector;
 import tech.ailef.jpromptmanager.completion.OpenAIGPT3Connector;
 
 /**
@@ -40,9 +40,9 @@ public class ExampleMain {
 		 * The example prompt templates take the two arguments `shopType` and `country`.
 		 * Let's initialize two different settings to seed our prompts later.
 		 */
-		Map<String, String> frenchCarShop = 
+		IContext frenchCarShop = 
 			new PromptContextBuilder().set("shopType", "car repair").set("country", "France").build();
-		Map<String, String> chineseFruitShop = 
+		IContext chineseFruitShop = 
 			new PromptContextBuilder().set("shopType", "fruit shop").set("country", "China").build();
 		
 		/*

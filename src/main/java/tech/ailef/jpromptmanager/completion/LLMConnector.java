@@ -1,16 +1,17 @@
 package tech.ailef.jpromptmanager.completion;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.IContext;
 
 import tech.ailef.jpromptmanager.JPromptManager;
+import tech.ailef.jpromptmanager.PromptContextBuilder;
 import tech.ailef.jpromptmanager.PromptStep;
 import tech.ailef.jpromptmanager.PromptTemplate;
-import tech.ailef.jpromptmanager.TemplateEngine;
 import tech.ailef.jpromptmanager.exceptions.JPromptManagerException;
 import tech.ailef.jpromptmanager.prompts.Prompt;
 /**
@@ -53,7 +54,7 @@ public interface LLMConnector {
 	 * @param jPrompt the jPrompt instance	
 	 * @return on object of type T as specified in the prompt class
 	 */
-	public default <T> T complete(Class<? extends Prompt<T>> promptClass, Map<String, String> context, JPromptManager jPrompt) {
+	public default <T> T complete(Class<? extends Prompt<T>> promptClass, IContext context, JPromptManager jPrompt) {
 		Prompt<T> prompt;
 		try {
 			prompt = promptClass.getConstructor().newInstance();
@@ -105,6 +106,6 @@ public interface LLMConnector {
 	 * @return
 	 */
 	public default <T> T complete(Class<? extends Prompt<T>> prompt, JPromptManager jPrompt) {
-		return complete(prompt, new HashMap<>(), jPrompt);
+		return complete(prompt, new PromptContextBuilder().build(), jPrompt);
 	}
 }

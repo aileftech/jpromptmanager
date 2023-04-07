@@ -1,7 +1,7 @@
 package tech.ailef.jpromptmanager;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.context.IContext;
 
 /**
  * A simple utility class to build a Map&lt;String, String&gt; that can be passed
@@ -9,14 +9,14 @@ import java.util.Map;
  * 
  */
 public class PromptContextBuilder {
-	private Map<String, String> context = new HashMap<>();
+	private Context context = new Context();
 	
-	public PromptContextBuilder set(String key, String value) {
-		this.context.put(key, value);
+	public PromptContextBuilder set(String key, Object value) {
+		this.context.setVariable(key, value);
 		return this;
 	}
 	
-	public Map<String, String> build() {
+	public IContext build() {
 		return context;
 	}
 	

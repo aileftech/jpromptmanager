@@ -17,6 +17,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+import org.thymeleaf.context.IContext;
 
 import tech.ailef.jpromptmanager.completion.LLMConnector;
 import tech.ailef.jpromptmanager.exceptions.JPromptManagerException;
@@ -81,7 +82,7 @@ public class JPromptManager {
 	 * @param context	a Map containing the variables to replace in the template
 	 * @return	an object of type T as specified by the prompt class implementation
 	 */
-	public <T> T complete(Class<? extends Prompt<T>> prompt, Map<String, String> context) {
+	public <T> T complete(Class<? extends Prompt<T>> prompt, IContext context) {
 		return llmConnector.complete(prompt, context, this);
 	}
 	
