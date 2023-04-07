@@ -2,6 +2,7 @@ package tech.ailef.jpromptmanager.completion;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.theokanning.openai.completion.CompletionChoice;
@@ -9,7 +10,6 @@ import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
 import com.theokanning.openai.service.OpenAiService;
 
-import tech.ailef.jpromptmanager.PromptContextBuilder;
 import tech.ailef.jpromptmanager.exceptions.JPromptManagerException;
 
 /**
@@ -66,10 +66,11 @@ public class OpenAIGPT3Connector implements LLMConnector {
 
 	@Override
 	public Map<String, String> getDefaultParams() {
-		return new PromptContextBuilder().set("model", model)
-				.set("temperature", "0")
-				.set("topP", "1")
-				.set("maxTokens", "256")
-				.build();
+		Map<String, String> params = new HashMap<>();
+		params.put("model", model);
+		params.put("temperature", "0");
+		params.put("topP", "1");
+		params.put("maxTokens", "256");
+		return params;
 	}
 }

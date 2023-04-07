@@ -2,6 +2,7 @@ package tech.ailef.jpromptmanager.completion;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,12 +14,11 @@ import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
 
-import tech.ailef.jpromptmanager.PromptContextBuilder;
 import tech.ailef.jpromptmanager.exceptions.JPromptManagerException;
 
 /**
  * An implementation of the LLMConnector that allows to make requests
- * to the GPT-3 OpenAI endpoints. 
+ * to the ChatGPT OpenAI endpoints. 
  *
  */
 public class OpenAIChatGPTConnector implements LLMConnector {
@@ -94,9 +94,10 @@ public class OpenAIChatGPTConnector implements LLMConnector {
 
 	@Override
 	public Map<String, String> getDefaultParams() {
-		return new PromptContextBuilder().set("model", model)
-				.set("temperature", "0")
-				.set("maxTokens", "256")
-				.build();
+		Map<String, String> params = new HashMap<>();
+		params.put("model", model);
+		params.put("temperature", "0");
+		params.put("maxTokens", "256");
+		return params;
 	}
 }
