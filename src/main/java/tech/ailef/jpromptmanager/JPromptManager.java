@@ -19,6 +19,8 @@ import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.thymeleaf.context.IContext;
 
+import com.theokanning.openai.OpenAiHttpException;
+
 import tech.ailef.jpromptmanager.completion.LLMConnector;
 import tech.ailef.jpromptmanager.exceptions.JPromptManagerException;
 import tech.ailef.jpromptmanager.prompts.Prompt;
@@ -37,6 +39,11 @@ public class JPromptManager {
 	 * The prompts as loaded from the XML file
 	 */
 	private Map<String, PromptTemplate> prompts = new HashMap<>();
+	
+	/**
+	 * Configuration objects
+	 */
+	private JPromptManagerOptions options;
 
 	/**
 	 * Initializes a JPromptManager instance with the provided connector.
@@ -46,6 +53,13 @@ public class JPromptManager {
 	 */
 	public JPromptManager(LLMConnector llmConnector) {
 		this.llmConnector = llmConnector;
+		this.options = new JPromptManagerOptions();
+		loadPrompts(getClass().getClassLoader().getResourceAsStream("prompts.xml"));
+	}
+	
+	public JPromptManager(LLMConnector llmConnector, JPromptManagerOptions options) {
+		this.llmConnector = llmConnector;
+		this.options = options;
 		loadPrompts(getClass().getClassLoader().getResourceAsStream("prompts.xml"));
 	}
 	
@@ -56,6 +70,24 @@ public class JPromptManager {
 	 */
 	public JPromptManager(LLMConnector llmConnector, Path promptFile) {
 		this.llmConnector = llmConnector;
+		this.options = new JPromptManagerOptions();
+		try {
+			loadPrompts(new FileInputStream(promptFile.toFile()));
+		} catch (FileNotFoundException e) {
+			throw new JPromptManagerException("Unable to file prompts file " + promptFile, e);
+		}
+	}
+	
+	/**
+	 * Initializes a JPromptManager instance with the provided connector and prompts file.
+	 * @param llmConnector	an instance of a LLM connector
+	 * @param promptFile	the XML file to load prompts from
+	 * @param options	configuration object for JPromptManager
+	 */
+	public JPromptManager(LLMConnector llmConnector, Path promptFile, JPromptManagerOptions options) {
+		this.options = options;
+		this.llmConnector = llmConnector;
+		this.options = options;
 		try {
 			loadPrompts(new FileInputStream(promptFile.toFile()));
 		} catch (FileNotFoundException e) {
@@ -86,7 +118,7 @@ public class JPromptManager {
 		return llmConnector.complete(prompt, context, this);
 	}
 	
-
+	
 	/**
 	 * Returns the {@link PromptTemplate} with the given name, null if missing.
 	 * @param name	the name of the prompt to get
@@ -121,9 +153,13 @@ public class JPromptManager {
 				List<Node> stepNodes = p.selectNodes("step");
 				stepNodes.forEach(step -> {
 					// Remove leading spaces caused by indentation in XML file
+					// Also removing <step> tags that are included when using asXML()
+					// which is needed to avoid having thymeleaf tags not present
 					String normalizedText = Arrays.stream(
-						step.getText().split("\\n")).map(l -> l.trim()
-					).collect(Collectors.joining("\n"));
+						step.asXML().split("\\n")).map(l -> l.trim())
+							.filter(l -> !l.startsWith("<step") && !l.startsWith("</step"))
+							.collect(Collectors.joining("\n")
+					);
 					
 					Element stepElement = (Element)step;
 					
@@ -158,5 +194,9 @@ public class JPromptManager {
 		} catch (DocumentException e) {
 			throw new JPromptManagerException(e);
 		}
+	}
+	
+	public JPromptManagerOptions getOptions() {
+		return options;
 	}
 }
