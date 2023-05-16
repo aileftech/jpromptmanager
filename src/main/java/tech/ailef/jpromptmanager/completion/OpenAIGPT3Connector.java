@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
@@ -22,6 +23,8 @@ public class OpenAIGPT3Connector implements LLMConnector {
 
 	private String model;
 	
+	private int maxRetries;
+	
 	/**
 	 * Builds the connector with the provided parameters.
 	 * @param apiKey	OpenAI secret key
@@ -29,10 +32,22 @@ public class OpenAIGPT3Connector implements LLMConnector {
 	 * @param model	the OpenAI model to use (this setting will be overridden if an individual `<step>` tag provides a different value)
 	 */
 	public OpenAIGPT3Connector(String apiKey, int timeout, String model) {
+		this(apiKey, timeout, 0, model);
+	}
+	
+	/**
+	 * Builds the connector with the provided parameters.
+	 * @param apiKey	OpenAI secret key
+	 * @param timeout	timeout for requests, 0 means no timeout
+	 * @param model	the OpenAI model to use (this setting will be overridden if an individual `<step>` tag provides a different value)
+	 * @param maxRetries the number of times to retry a request that fails, default 0
+	 */
+	public OpenAIGPT3Connector(String apiKey, int timeout, int maxRetries, String model) {
 		if (model == null)
 			throw new JPromptManagerException("Must specify which OpenAI model to use");
-
-		service = new OpenAiService(apiKey, Duration.ofSeconds(timeout));
+		
+		this.maxRetries = maxRetries;
+		this.service = new OpenAiService(apiKey, Duration.ofSeconds(timeout));
 		this.model = model;
 	}
 
@@ -47,21 +62,37 @@ public class OpenAIGPT3Connector implements LLMConnector {
 		String model = params.get("model");
 		int maxTokens = Integer.parseInt(params.get("maxTokens"));
 		
-		CompletionRequest completionRequest = CompletionRequest.builder()
-		        .prompt(prompt)
-		        .stop(Arrays.asList(LLMConnector.PROMPT_TOKEN))
-		        .temperature(temperature)
-		        .topP(topP)
-		        .model(model)
-		        .maxTokens(maxTokens)
-		        .n(1)
-		        .echo(false)
-		        .build();
+		int tries = 1;
+		while (tries <= maxRetries) {
+			try {
+				CompletionRequest completionRequest = CompletionRequest.builder()
+				        .prompt(prompt)
+				        .stop(Arrays.asList(LLMConnector.PROMPT_TOKEN))
+				        .temperature(temperature)
+				        .topP(topP)
+				        .model(model)
+				        .maxTokens(maxTokens)
+				        .n(1)
+				        .echo(false)
+				        .build();
+				
+				CompletionResult createCompletion = service.createCompletion(completionRequest);
+				CompletionChoice choice = createCompletion.getChoices().get(0);
+				return choice.getText();
+			} catch (OpenAiHttpException e) {
+				System.err.println("On try " + tries + ", got exception: " + e.getMessage());
+                tries++;
+                
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e1) {
+                    throw new RuntimeException(e);
+                }
+			}
+		}
 		
-		CompletionResult createCompletion = service.createCompletion(completionRequest);
-		CompletionChoice choice = createCompletion.getChoices().get(0);
+		throw new RuntimeException("Request failed after " + tries + " retries");
 		
-		return choice.getText();
 	}
 
 	@Override

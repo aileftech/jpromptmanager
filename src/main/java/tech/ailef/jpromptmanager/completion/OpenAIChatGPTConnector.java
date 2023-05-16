@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
@@ -28,6 +29,20 @@ public class OpenAIChatGPTConnector implements LLMConnector {
 	
 	private String systemPrompt;
 	
+	private int maxRetries;
+	
+
+	/**
+	 * Builds the connector to ChatGPT with the required parameters.
+	 * @param apiKey	OpenAI secret key
+	 * @param timeout	timeout for requests, 0 means no timeout
+	 * @param model	the OpenAI model to use (this setting will be overridden if an individual `<step>` tag provides a different value),
+	 * @param systemPrompt	the system prompt
+	 */
+	public OpenAIChatGPTConnector(String apiKey, int timeout, String model, String systemPrompt) {
+		this(apiKey, timeout, 0, model, systemPrompt);
+	}
+	
 	/**
 	 * Builds the connector to ChatGPT with the required parameters.
 	 * @param apiKey	OpenAI secret key
@@ -35,7 +50,18 @@ public class OpenAIChatGPTConnector implements LLMConnector {
 	 * @param model	the OpenAI model to use (this setting will be overridden if an individual `<step>` tag provides a different value),
 	 */
 	public OpenAIChatGPTConnector(String apiKey, int timeout, String model) {
-		this(apiKey, timeout, model, "You are a helpful assistant.");
+		this(apiKey, timeout, 0, model, "You are a helpful assistant.");
+	}
+	
+	/**
+	 * Builds the connector to ChatGPT with the required parameters.
+	 * @param apiKey	OpenAI secret key
+	 * @param timeout	timeout for requests, 0 means no timeout
+	 * @param model	the OpenAI model to use (this setting will be overridden if an individual `<step>` tag provides a different value)
+	 * @param maxRetries	the number of times to retry a request that fails, default 0
+	 */
+	public OpenAIChatGPTConnector(String apiKey, int timeout, int maxRetries, String model) {
+		this(apiKey, timeout, maxRetries, model, "You are a helpful assistant.");
 	}
 	
 	/**
@@ -45,8 +71,9 @@ public class OpenAIChatGPTConnector implements LLMConnector {
 	 * @param model	the OpenAI model to use (this setting will be overridden if an individual `<step>` tag provides a different value),
 	 * @param systemPrompt the initial system prompt that gets prepended to each conversation (see https://platform.openai.com/docs/guides/chat)
 	 */
-	public OpenAIChatGPTConnector(String apiKey, int timeout, String model, String systemPrompt) {
+	public OpenAIChatGPTConnector(String apiKey, int timeout, int maxRetries, String model, String systemPrompt) {
 		service = new OpenAiService(apiKey, Duration.ofSeconds(timeout));
+		this.maxRetries = maxRetries;
 		
 		if (model == null)
 			throw new JPromptManagerException("Must specify which OpenAI model to use");
@@ -78,18 +105,33 @@ public class OpenAIChatGPTConnector implements LLMConnector {
 			.collect(Collectors.toList());
 		chatMessages.add(0, new ChatMessage("system", systemPrompt));
 		
+		int tries = 1;
+		while (tries <= maxRetries) {
+			try {
+				ChatCompletionRequest completionRequest = ChatCompletionRequest.builder()
+					.messages(chatMessages)
+					.maxTokens(maxTokens)
+					.temperature(temperature)
+					.model(model)
+					.build();
+				
+				ChatCompletionResult chatCompletion = service.createChatCompletion(completionRequest);
+				ChatCompletionChoice choice = chatCompletion.getChoices().get(0);
+					
+				return choice.getMessage().getContent();
+			} catch (OpenAiHttpException e) {
+				System.err.println("On try " + tries + ", got exception: " + e.getMessage());
+                tries++;
+                
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e1) {
+                    throw new RuntimeException(e);
+                }
+			}
+		}
 		
-		ChatCompletionRequest completionRequest = ChatCompletionRequest.builder()
-			.messages(chatMessages)
-			.maxTokens(maxTokens)
-			.temperature(temperature)
-			.model(model)
-			.build();
-		
-		ChatCompletionResult chatCompletion = service.createChatCompletion(completionRequest);
-		ChatCompletionChoice choice = chatCompletion.getChoices().get(0);
-			
-		return choice.getMessage().getContent();
+		throw new RuntimeException("Request failed after " + tries + " retries");
 	}
 
 	@Override
