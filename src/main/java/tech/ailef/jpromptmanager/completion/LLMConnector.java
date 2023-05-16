@@ -84,6 +84,10 @@ public interface LLMConnector {
 			requestParams.putAll(promptStep.getParams());
 			
 			String currentPrompt = incrementalPrompt.toString();
+			
+			if (jPrompt.getOptions().isPrintPrompts())
+				System.out.println(currentPrompt);
+			
 			logger.info(
 				prompt.getName() + ":" + (i + 1) + "/" + promptTemplate.getSteps().size() + ":" + promptStep.getName()
 				+ " ~" + (currentPrompt.length() / 3) + " tokens | params: " + requestParams 
