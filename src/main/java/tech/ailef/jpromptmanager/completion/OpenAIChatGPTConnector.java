@@ -40,7 +40,7 @@ public class OpenAIChatGPTConnector implements LLMConnector {
 	 * @param systemPrompt	the system prompt
 	 */
 	public OpenAIChatGPTConnector(String apiKey, int timeout, String model, String systemPrompt) {
-		this(apiKey, timeout, 0, model, systemPrompt);
+		this(apiKey, timeout, 1, model, systemPrompt);
 	}
 	
 	/**
@@ -50,7 +50,7 @@ public class OpenAIChatGPTConnector implements LLMConnector {
 	 * @param model	the OpenAI model to use (this setting will be overridden if an individual `<step>` tag provides a different value),
 	 */
 	public OpenAIChatGPTConnector(String apiKey, int timeout, String model) {
-		this(apiKey, timeout, 0, model, "You are a helpful assistant.");
+		this(apiKey, timeout, 1, model, "You are a helpful assistant.");
 	}
 	
 	/**
@@ -114,10 +114,11 @@ public class OpenAIChatGPTConnector implements LLMConnector {
 					.temperature(temperature)
 					.model(model)
 					.build();
-				
 				ChatCompletionResult chatCompletion = service.createChatCompletion(completionRequest);
 				ChatCompletionChoice choice = chatCompletion.getChoices().get(0);
-					
+				
+				String finishReason = choice.getFinishReason();
+				
 				return choice.getMessage().getContent();
 			} catch (OpenAiHttpException e) {
 				System.err.println("On try " + tries + ", got exception: " + e.getMessage());
@@ -128,6 +129,8 @@ public class OpenAIChatGPTConnector implements LLMConnector {
                 } catch (InterruptedException e1) {
                     throw new RuntimeException(e);
                 }
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		

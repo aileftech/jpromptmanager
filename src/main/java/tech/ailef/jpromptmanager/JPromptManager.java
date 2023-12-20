@@ -19,8 +19,6 @@ import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.thymeleaf.context.IContext;
 
-import com.theokanning.openai.OpenAiHttpException;
-
 import tech.ailef.jpromptmanager.completion.LLMConnector;
 import tech.ailef.jpromptmanager.exceptions.JPromptManagerException;
 import tech.ailef.jpromptmanager.prompts.Prompt;
@@ -117,7 +115,6 @@ public class JPromptManager {
 	public <T> T complete(Class<? extends Prompt<T>> prompt, IContext context) {
 		return llmConnector.complete(prompt, context, this);
 	}
-	
 	
 	/**
 	 * Returns the {@link PromptTemplate} with the given name, null if missing.
